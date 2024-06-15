@@ -36,4 +36,4 @@ EXPOSE 8080
 ENV PYTHONUNBUFFERED=1
 
 # Run Django using gunicorn, serving static files
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--chdir", "expensesapptracker", "expensetrackerapp.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--chdir", "expensesapptracker", "expensesapptracker.wsgi:application"]
