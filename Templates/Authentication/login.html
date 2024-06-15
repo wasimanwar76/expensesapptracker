@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Page</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      .user-craeted {
+        text-align: center;
+        color: greenyellow;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Arial", sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #365dcd;
+      }
+      .login-container {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+      }
+      .login-container h2 {
+        margin-bottom: 20px;
+        color: #333;
+      }
+      .login-container .input-group {
+        margin-bottom: 15px;
+      }
+      .login-container .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+      }
+      .login-container .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+      }
+      .login-container .input-group input:focus {
+        border-color: #365dcd;
+      }
+      .login-container button {
+        width: 100%;
+        padding: 10px;
+        background: #365dcd;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .login-container button:hover {
+        background: #365dcd;
+      }
+      .login-container .footer {
+        margin-top: 20px;
+        text-align: center;
+        color: #777;
+      }
+      .login-container .footer a {
+        color: #365dcd;
+        text-decoration: none;
+      }
+      .login-container .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .error-message {
+        list-style: none;
+        text-align: center;
+        color: brown;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <a href="{% url 'home' %}">
+        <h1>
+          <i class="fa-solid fa-house"></i>
+        </h1>
+      </a>
+      <div id="messages">
+        {% if messages %}
+        <ul>
+          {% for message in messages %}
+          <li
+            class="{% if message.tags %}{{ message.tags }}-message{% endif %}"
+            id="message"
+          >
+            {{ message }}
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+      <h2>Login</h2>
+      <form action="/authentication/login" method="post">
+        {% csrf_token %}
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="text" id="email" name="email" required />
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <button type="submit">Login</button>
+      </form>
+      <div class="footer">
+        <p>
+          Don't have an account? <a href="/authentication/signup">Sign up</a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (event) {
+          var errors = [];
+
+          var email = document.getElementById("email").value;
+          var password = document.getElementById("password").value;
+
+          if (password.length < 8) {
+            errors.push("Password must be at least 8 characters long.");
+          }
+
+          var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+          if (!emailPattern.test(email)) {
+            errors.push("Invalid email address.");
+          }
+
+          if (errors.length > 0) {
+            event.preventDefault();
+            var errorMessages = document.getElementById("messages");
+            errorMessages.innerHTML = "";
+            errors.forEach(function (error) {
+              var li = document.createElement("li");
+              li.className = "error-message";
+              li.textContent = error;
+              errorMessages.appendChild(li);
+            });
+          }
+        });
+    </script>
+  </body>
+</html>

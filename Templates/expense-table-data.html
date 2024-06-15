@@ -1,0 +1,38 @@
+{% extends "index.html" %} {% block content %}
+
+<h1 class="text-center m-5">Expense Table Summary</h1>
+<table class="table table-striped {% if not expenseData %}d-none{% endif %}">
+  <thead>
+    <tr>
+      <th scope="col">Amount</th>
+      <th scope="col">Description</th>
+      <th scope="col">Category</th>
+      <th scope="col">Date</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if expenseData %} {% for expense in expenseData %}
+    <tr>
+      <th scope="row">{{ expense.amount }}</th>
+      <td>{{ expense.category }}</td>
+      <td>{{ expense.description }}</td>
+      <td>{{ expense.date }}</td>
+      <td>
+        <!-- <form method="post" action="">
+            {% csrf_token %} -->
+        <a href="{% url 'expense_edit' expense.pk %}" class="btn btn-success"
+          >Edit</a
+        >
+        <!-- </form> -->
+        <a href="{% url 'expense_delete' expense.pk  %}" class="btn btn-danger"
+          ><i class="fa-solid fa-x"></i
+        ></a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<h1 class="text-center">No Data</h1>
+{% endif %} {% endblock content %}

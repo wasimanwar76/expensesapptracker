@@ -1,0 +1,22 @@
+{% extends "index.html" %} {% block content %}
+
+<h1 class="text-center m-5">Expense Table Summary</h1>
+<table class="table table-striped {% if not totalSalary %}d-none{% endif %}">
+  <thead>
+    <tr>
+      <th scope="col">Amount</th>
+      <th scope="col">Month</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if totalSalary %} {% for salary in totalSalary %}
+    <tr>
+      <th scope="row">{{ salary.amount }}</th>
+      <td>{{ salary.month }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<h1 class="text-center">No Data</h1>
+{% endif %} {% endblock content %}

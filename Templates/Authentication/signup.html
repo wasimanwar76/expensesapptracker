@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup Page</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #365dcd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .signup-container {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 40px;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .signup-form h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #666;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #365dcd;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #365dcd;
+    }
+
+    .signup-form p {
+      margin-top: 20px;
+      color: #666;
+    }
+
+    .signup-form p a {
+      color: #365dcd;
+      text-decoration: none;
+    }
+
+    .signup-form p a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      color: red;
+      margin-bottom: 10px;
+    }
+
+    a {
+      text-decoration: none;
+    }
+  </style>
+  <body>
+    <div class="signup-container">
+      <a href="{% url 'home' %}">
+        <h1>
+          <i class="fa-solid fa-house"></i>
+        </h1>
+      </a>
+      <div class="signup-form">
+        <div id="errorMessages">
+          {% if messages %}
+          <ul>
+            {% for message in messages %}
+            <li class="error-message">{{ message }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+        <h2>Create an Account</h2>
+        <form
+          id="signup-form"
+          action="/authentication/signup"
+          method="post"
+          onsubmit="validateForm"
+        >
+          {% csrf_token %}
+          <div class="input-group">
+            <label for="username">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              required
+              onfocus="clearErrorMessage()"
+            />
+          </div>
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              onfocus="clearErrorMessage()"
+            />
+          </div>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              onfocus="clearErrorMessage()"
+            />
+          </div>
+          <div class="input-group">
+            <label for="confirm-password" required>Confirm Password</label>
+            <input
+              type="password"
+              id="confirm-password"
+              name="confirm-password"
+              required
+              onfocus="clearErrorMessage()"
+            />
+          </div>
+          <button type="submit">Sign Up</button>
+        </form>
+
+        <p>
+          Already have an account?
+          <a href="/authentication/login">Login here</a>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      document
+        .getElementById("signupForm")
+        .addEventListener("submit", function (event) {
+          var errors = [];
+
+          var username = document.getElementById("username").value;
+          var email = document.getElementById("email").value;
+          var password = document.getElementById("password").value;
+
+          if (username.length < 5) {
+            errors.push("Username must be at least 5 characters long.");
+          }
+
+          if (password.length < 8) {
+            errors.push("Password must be at least 8 characters long.");
+          }
+
+          var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+          if (!emailPattern.test(email)) {
+            errors.push("Invalid email address.");
+          }
+
+          if (errors.length > 0) {
+            event.preventDefault();
+            var errorMessages = document.getElementById("errorMessages");
+            errorMessages.innerHTML = "";
+            errors.forEach(function (error) {
+              var li = document.createElement("li");
+              li.className = "error-message";
+              li.textContent = error;
+              errorMessages.appendChild(li);
+            });
+          }
+        });
+    </script>
+  </body>
+</html>

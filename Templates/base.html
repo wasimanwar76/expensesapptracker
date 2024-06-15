@@ -1,0 +1,263 @@
+{% extends "index.html" %} {% block content %}
+<!-- Begin Page Content -->
+<div class="container-fluid">
+  <!-- Page Heading -->
+  <div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+
+    <div class="align-items-center justify-content-between mb-4">
+      <a
+        href="/expenses"
+        class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+        ><i class="fas fa-download fa-sm text-white-50"></i> New Expenses</a
+      >
+      <a
+        href="{% url 'add_monthly_earning' %}"
+        class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+        ><i class="fas fa-download fa-sm text-white-50"></i> Add Earning</a
+      >
+    </div>
+  </div>
+
+  <!-- Content Row -->
+  <div class="row">
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div
+                class="text-xs font-weight-bold text-primary text-uppercase mb-1"
+              >
+                Earnings (Monthly)
+              </div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">
+                {% if monthly_earnings %} {% for amount in monthly_earnings %}
+                <span>Rs. {{ amount.amount }}</span>
+                {% endfor %} {% else %}
+                <span>No earnings recorded for this month.</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-calendar fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+              <div
+                class="text-xs font-weight-bold text-success text-uppercase mb-1"
+              >
+                Expenses (Monthly)
+              </div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">
+                Rs {{total_expense}}
+              </div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <table class="table table-striped {% if not expenseData %}d-none{% endif %}">
+    <thead>
+      <tr>
+        <th scope="col">Amount</th>
+        <th scope="col">Description</th>
+        <th scope="col">Category</th>
+        <th scope="col">Date</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if expenseData %} {% for expense in expenseData %}
+      <tr>
+        <th scope="row">{{ expense.amount }}</th>
+        <td>{{ expense.category }}</td>
+        <td>{{ expense.description }}</td>
+        <td>{{ expense.date }}</td>
+        <td>
+          <!-- <form method="post" action="">
+            {% csrf_token %} -->
+          <a href="{% url 'expense_edit' expense.pk %}" class="btn btn-success"
+            >Edit</a
+          >
+          <!-- </form> -->
+          <a
+            href="{% url 'expense_delete' expense.pk  %}"
+            class="btn btn-danger"
+            ><i class="fa-solid fa-x"></i
+          ></a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <h1 class="text-center">No Data</h1>
+  {% endif %}
+</div>
+
+<!-- /.container-fluid -->
+
+<!-- Chart Start -->
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="chart-container">
+        <canvas id="myPieChart" class="chart"></canvas>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="chart-container">
+        <canvas id="myLineChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Your JavaScript for Chart.js -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    fetch("/api/pie_chart_data/")
+      .then((response) => response.json())
+      .then((data) => {
+        const labels = data.data.map((item) => item.description);
+        const dataset = data.data.map((item) => item.total_amount);
+        const ctx = document.getElementById("myPieChart").getContext("2d");
+        const config = {
+          type: "pie",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Expenses by Category",
+                data: dataset,
+                backgroundColor: [
+                  "#FF6384",
+                  "#36A2EB",
+                  "#FFCE56",
+                  "#4BC0C0",
+                  "#9966FF",
+                  "#FF9900",
+                  "#00CC66",
+                  "#FF3366",
+                  "#3399FF",
+                ],
+                hoverOffset: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "top",
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (tooltipItem) {
+                    return (
+                      labels[tooltipItem.dataIndex] +
+                      ": " +
+                      tooltipItem.formattedValue
+                    );
+                  },
+                },
+              },
+            },
+          },
+        };
+
+        new Chart(ctx, config);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    fetch("/api/line_chart_data/")
+      .then((response) => response.json())
+      .then((data) => {
+        const labels = data.labels; // Use labels from the fetched data
+        const dataset = data.data; // Use data from the fetched data
+
+        const ctx = document.getElementById("myLineChart").getContext("2d");
+        const config = {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Monthly Expenses",
+                data: dataset,
+                borderColor: "#007BFF",
+                backgroundColor: "rgba(0, 123, 255, 0.2)",
+                tension: 0.1,
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "top",
+              },
+              tooltip: {
+                mode: "index",
+                intersect: false,
+              },
+            },
+            scales: {
+              x: {
+                display: true,
+                title: {
+                  display: true,
+                  text: "Month",
+                },
+              },
+              y: {
+                display: true,
+                title: {
+                  display: true,
+                  text: "Amount",
+                },
+              },
+            },
+          },
+        };
+
+        new Chart(ctx, config);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  });
+</script>
+
+<!-- Chart End -->
+
+<!-- Footer -->
+<footer class="sticky-footer bg-white">
+  <div class="container my-auto">
+    <div class="copyright text-center my-auto">
+      <span>Copyright &copy; Bhavana Dixit 2024</span>
+    </div>
+  </div>
+</footer>
+<!-- End of Footer -->
+
+<!-- End of Page Wrapper -->
+
+{% endblock content %}
