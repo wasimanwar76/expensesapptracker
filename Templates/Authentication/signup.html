@@ -11,97 +11,105 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #365dcd;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+
+      .signup-container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        padding: 40px;
+        max-width: 400px;
+        width: 100%;
+        position: relative;
+      }
+
+      .signup-form h2 {
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .input-group {
+        margin-bottom: 15px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #666;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #365dcd;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      button:hover {
+        background: #365dcd;
+      }
+
+      .signup-form p {
+        margin-top: 20px;
+        color: #666;
+      }
+
+      .signup-form p a {
+        color: #365dcd;
+        text-decoration: none;
+      }
+
+      .signup-form p a:hover {
+        text-decoration: underline;
+      }
+
+      .error-message {
+        color: red;
+        margin-bottom: 10px;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      .home-icon {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: #ffffff;
+        font-size: 24px;
+        text-decoration: none;
+      }
+    </style>
   </head>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #365dcd;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .signup-container {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 40px;
-      max-width: 400px;
-      width: 100%;
-    }
-
-    .signup-form h2 {
-      margin-bottom: 20px;
-      color: #333;
-    }
-
-    .input-group {
-      margin-bottom: 15px;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 5px;
-      color: #666;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #365dcd;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background: #365dcd;
-    }
-
-    .signup-form p {
-      margin-top: 20px;
-      color: #666;
-    }
-
-    .signup-form p a {
-      color: #365dcd;
-      text-decoration: none;
-    }
-
-    .signup-form p a:hover {
-      text-decoration: underline;
-    }
-
-    .error-message {
-      color: red;
-      margin-bottom: 10px;
-    }
-
-    a {
-      text-decoration: none;
-    }
-  </style>
   <body>
+    <a class="home-icon" href="{% url 'home' %}">
+      <i class="fa-solid fa-house"></i>
+    </a>
     <div class="signup-container">
-      <a href="{% url 'home' %}">
-        <h1>
-          <i class="fa-solid fa-house"></i>
-        </h1>
-      </a>
       <div class="signup-form">
         <div id="errorMessages">
           {% if messages %}
@@ -114,10 +122,10 @@
         </div>
         <h2>Create an Account</h2>
         <form
-          id="signup-form"
+          id="signupForm"
           action="/authentication/signup"
           method="post"
-          onsubmit="validateForm"
+          onsubmit="validateForm(event)"
         >
           {% csrf_token %}
           <div class="input-group">
@@ -151,7 +159,7 @@
             />
           </div>
           <div class="input-group">
-            <label for="confirm-password" required>Confirm Password</label>
+            <label for="confirm-password">Confirm Password</label>
             <input
               type="password"
               id="confirm-password"
@@ -171,40 +179,52 @@
     </div>
 
     <script>
+      function validateForm(event) {
+        var errors = [];
+
+        var username = document.getElementById("username").value;
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirm-password").value;
+
+        if (username.length < 5) {
+          errors.push("Username must be at least 5 characters long.");
+        }
+
+        if (password.length < 8) {
+          errors.push("Password must be at least 8 characters long.");
+        }
+
+        if (password !== confirmPassword) {
+          errors.push("Passwords do not match.");
+        }
+
+        var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        if (!emailPattern.test(email)) {
+          errors.push("Invalid email address.");
+        }
+
+        if (errors.length > 0) {
+          event.preventDefault();
+          var errorMessages = document.getElementById("errorMessages");
+          errorMessages.innerHTML = "";
+          errors.forEach(function (error) {
+            var li = document.createElement("li");
+            li.className = "error-message";
+            li.textContent = error;
+            errorMessages.appendChild(li);
+          });
+        }
+      }
+
+      function clearErrorMessage() {
+        var errorMessages = document.getElementById("errorMessages");
+        errorMessages.innerHTML = "";
+      }
+
       document
         .getElementById("signupForm")
-        .addEventListener("submit", function (event) {
-          var errors = [];
-
-          var username = document.getElementById("username").value;
-          var email = document.getElementById("email").value;
-          var password = document.getElementById("password").value;
-
-          if (username.length < 5) {
-            errors.push("Username must be at least 5 characters long.");
-          }
-
-          if (password.length < 8) {
-            errors.push("Password must be at least 8 characters long.");
-          }
-
-          var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-          if (!emailPattern.test(email)) {
-            errors.push("Invalid email address.");
-          }
-
-          if (errors.length > 0) {
-            event.preventDefault();
-            var errorMessages = document.getElementById("errorMessages");
-            errorMessages.innerHTML = "";
-            errors.forEach(function (error) {
-              var li = document.createElement("li");
-              li.className = "error-message";
-              li.textContent = error;
-              errorMessages.appendChild(li);
-            });
-          }
-        });
+        .addEventListener("submit", validateForm);
     </script>
   </body>
 </html>

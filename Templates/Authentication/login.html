@@ -12,7 +12,7 @@
       referrerpolicy="no-referrer"
     />
     <style>
-      .user-craeted {
+      .user-created {
         text-align: center;
         color: greenyellow;
       }
@@ -33,6 +33,7 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         max-width: 400px;
         width: 100%;
+        position: relative;
       }
       .login-container h2 {
         margin-bottom: 20px;
@@ -81,22 +82,27 @@
       .login-container .footer a:hover {
         text-decoration: underline;
       }
-
       .error-message {
         list-style: none;
         text-align: center;
         color: brown;
         margin-bottom: 10px;
       }
+      .home-icon {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        color: #ffffff;
+        font-size: 24px;
+        text-decoration: none;
+      }
     </style>
   </head>
   <body>
+    <a class="home-icon" href="{% url 'home' %}">
+      <i class="fa-solid fa-house"></i>
+    </a>
     <div class="login-container">
-      <a href="{% url 'home' %}">
-        <h1>
-          <i class="fa-solid fa-house"></i>
-        </h1>
-      </a>
       <div id="messages">
         {% if messages %}
         <ul>
@@ -112,7 +118,7 @@
         {% endif %}
       </div>
       <h2>Login</h2>
-      <form action="/authentication/login" method="post">
+      <form id="loginForm" action="/authentication/login" method="post">
         {% csrf_token %}
         <div class="input-group">
           <label for="email">Email</label>
